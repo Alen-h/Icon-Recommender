@@ -28,12 +28,14 @@ An AI-powered icon recommendation tool that helps developers and designers find 
 **Live Demo:** [icon-recommender.vercel.app](https://icon-recommender.vercel.app)
 
 ### How it works:
+
 1. **Describe your needs** in natural language
 2. **AI analyzes** your requirements using advanced language understanding
 3. **Get curated suggestions** from 5 icon libraries with explanations
 4. **Copy and use** icon names or React code snippets instantly
 
 ### Example queries:
+
 - "I need an icon for a delete button in my mobile app"
 - "Looking for icons for a user profile section"
 - "Need icons for a shopping cart feature"
@@ -49,7 +51,7 @@ The AI provides context-aware recommendations with detailed explanations for why
 - **Runtime**: [React 19.1.0](https://react.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/) with Radix UI primitives
-- **Icon Libraries**: 
+- **Icon Libraries**:
   - [IconPark](https://iconpark.oceanengine.com/) (v1.4.2)
   - [Font Awesome](https://fontawesome.com/) (v7.0.1)
   - [Ant Design Icons](https://ant.design/components/icon/) (v5.6.1)
@@ -61,12 +63,14 @@ The AI provides context-aware recommendations with detailed explanations for why
 ## 📦 Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/Alen-h/Icon-Recommender.git
    cd Icon-Recommender
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    # or
@@ -76,17 +80,21 @@ The AI provides context-aware recommendations with detailed explanations for why
    ```
 
 3. **Set up environment variables:**
+
+   For local development, create a `.env.local` file:
+
    ```bash
-   cp config.local.example.js config.local.js
+   cp env.example .env.local
    ```
-   Edit `config.local.js` with your GLM API credentials:
-   ```javascript
-   module.exports = {
-     GLM_API_TOKEN: "your-glm-api-token-here"
-   };
+
+   Edit `.env.local` with your GLM API credentials:
+
+   ```bash
+   GLM_API_TOKEN=your-glm-api-token-here
    ```
 
 4. **Run the development server:**
+
    ```bash
    npm run dev
    # or
@@ -101,16 +109,23 @@ The AI provides context-aware recommendations with detailed explanations for why
 ## 🔧 Configuration
 
 ### Environment Setup
-The application requires a GLM API token for AI-powered recommendations. Set up your `config.local.js` file:
 
-```javascript
-module.exports = {
-  GLM_API_TOKEN: "your-glm-api-token-here"
-};
+The application requires a GLM API token for AI-powered recommendations. Set up your environment variables:
+
+**For Local Development:**
+Create a `.env.local` file:
+
+```bash
+GLM_API_TOKEN=your-glm-api-token-here
 ```
 
+**For Production (Vercel):**
+Add the environment variable in your Vercel dashboard under Project Settings > Environment Variables.
+
 ### Customizing AI Behavior
+
 The application uses a system prompt from `public/system-prompt.md` to guide the AI's icon recommendations. You can customize this prompt to:
+
 - Adjust recommendation criteria
 - Change the response format
 - Add specific guidelines for your use case
@@ -119,18 +134,21 @@ The application uses a system prompt from `public/system-prompt.md` to guide the
 ## 🎯 Usage
 
 ### Basic Workflow
+
 1. **Describe your needs**: Enter a detailed description of what kind of icon you need
 2. **Get AI recommendations**: Click "Get Recommendations" or press `Cmd+Enter`
 3. **Review suggestions**: Browse AI-curated icons from multiple libraries with explanations
 4. **Copy and implement**: Use copy buttons to get icon names or ready-to-use React code
 
 ### Best Practices for Descriptions
+
 - Be specific about the context (e.g., "mobile app delete button" vs "delete")
 - Mention the use case (e.g., "user profile", "shopping cart", "file upload")
 - Include style preferences if any (e.g., "minimalist", "outlined", "filled")
 - Specify the action or function (e.g., "save", "edit", "share", "download")
 
 ### Icon Output Formats
+
 - **Icon Name**: Copy the exact icon name for manual implementation
 - **React Code**: Copy ready-to-use JSX with proper imports and props
 
@@ -152,14 +170,12 @@ Icon-Recommender/
 │       ├── card.tsx      # Card component
 │       └── textarea.tsx  # Textarea component
 ├── lib/                  # Utility libraries
-│   ├── config.ts         # Configuration utilities
 │   └── utils.ts          # Helper functions
 ├── public/               # Static assets
 │   ├── icons/
 │   │   └── iconpark.json # IconPark icon data
 │   └── system-prompt.md  # AI system prompt template
-├── config.local.js       # Local environment configuration
-├── config.local.example.js # Configuration example
+├── env.example           # Environment variables template
 ├── components.json       # shadcn/ui configuration
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
@@ -172,13 +188,15 @@ Icon-Recommender/
 Contributions are welcome! Whether it's adding new icon libraries, improving AI recommendations, or enhancing the UI, we'd love your help.
 
 ### Development Setup
+
 1. Fork the project
 2. Clone your fork: `git clone https://github.com/your-username/Icon-Recommender.git`
 3. Install dependencies: `npm install`
-4. Set up your `config.local.js` with API credentials
+4. Set up your `.env.local` with API credentials (copy from `env.example`)
 5. Start development server: `npm run dev`
 
 ### Contribution Guidelines
+
 1. Create your feature branch (`git checkout -b feature/amazing-feature`)
 2. Make your changes with proper TypeScript typing
 3. Test your changes thoroughly
@@ -187,6 +205,7 @@ Contributions are welcome! Whether it's adding new icon libraries, improving AI 
 6. Open a Pull Request with a clear description
 
 ### Areas for Contribution
+
 - **New Icon Libraries**: Add support for additional icon sets
 - **AI Improvements**: Enhance the recommendation algorithm
 - **UI/UX**: Improve the user interface and experience
@@ -221,12 +240,17 @@ npm run build    # Build for production
 npm start        # Start production server
 ```
 
-Environment variables needed for production:
-- `GLM_API_TOKEN`: Your GLM API token for AI recommendations
+### Environment Variables
+
+Add these environment variables in your Vercel dashboard:
+
+- `GLM_API_TOKEN`: Your GLM API token for AI recommendations (required)
+- `GLM_API_URL`: GLM API endpoint (optional, defaults to https://open.bigmodel.cn/api/paas/v4/chat/completions)
 
 ## 🐛 Issues & Support
 
 If you encounter any issues or have questions:
+
 - [Open an issue](https://github.com/Alen-h/Icon-Recommender/issues) on GitHub
 - Check existing issues for solutions
 - Provide detailed reproduction steps for bugs
