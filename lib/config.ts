@@ -20,10 +20,9 @@ export const getConfig = (): Config => {
   // For development - try to import local config
   try {
     // Dynamic import that won't fail in production
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const localConfig = require('../config.local.js');
     return localConfig.config;
-  } catch {
+  } catch (error) {
     // Fallback error message for missing configuration
     throw new Error(
       'Configuration not found. Please:\n' +

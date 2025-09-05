@@ -1,12 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, Search, AlertCircle } from "lucide-react";
+import { Loader2, Sparkles, Search, AlertCircle, Copy, Check } from "lucide-react";
 import * as IconPark from "@icon-park/react";
-import { getConfig } from "@/lib/config";
+import * as AntDesign from "@ant-design/icons";
+import * as Heroicons from "@heroicons/react/24/outline";
+import * as HeroiconsSolid from "@heroicons/react/24/solid";
+import * as Lucide from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import * as FontAwesome from "@fortawesome/free-solid-svg-icons";
 
 interface IconRecommendation {
   name: string;
@@ -14,19 +20,15 @@ interface IconRecommendation {
 }
 
 interface LLMResponse {
-  icons: IconRecommendation[];
+  iconpark?: IconRecommendation[];
+  font_awesome?: IconRecommendation[];
+  ant_design?: IconRecommendation[];
+  heroicons?: IconRecommendation[];
+  lucide?: IconRecommendation[];
 }
 
-interface IconParkIconData {
-  id: number;
-  title: string;
-  name: string;
-  category: string;
-  categoryCN: string;
-  author: string;
-  tag: string[];
-  rtl: boolean;
-}
+type IconLibrary = 'iconpark' | 'font_awesome' | 'ant_design' | 'heroicons' | 'lucide';
+
 
 // Icon props interface for IconPark components
 interface IconProps {
@@ -36,16 +38,183 @@ interface IconProps {
   className?: string;
 }
 
+// Helper function to render error icon
+const ErrorIcon = () => (
+  <div className="flex items-center justify-center w-8 h-8 bg-muted rounded border-2 border-dashed border-muted-foreground/30">
+    <AlertCircle className="w-4 h-4 text-muted-foreground" />
+  </div>
+);
+
+// Global variables to store icon names for validation
+let iconParkNamesSet: Set<string> | null = null;
+let fontAwesomeNamesSet: Set<string> | null = null;
+let antDesignNamesSet: Set<string> | null = null;
+let heroiconsNamesSet: Set<string> | null = null;
+let lucideNamesSet: Set<string> | null = null;
+
+// Function to load IconPark icon names
+const loadIconParkNames = async (): Promise<Set<string>> => {
+  if (iconParkNamesSet) {
+    return iconParkNamesSet;
+  }
+  
+  try {
+    const response = await fetch('/icons/iconpark.json');
+    if (!response.ok) {
+      throw new Error('Failed to load IconPark icons data');
+    }
+    const iconsData = await response.json();
+    iconParkNamesSet = new Set(iconsData.map((icon: { name: string }) => icon.name));
+    return iconParkNamesSet;
+  } catch (error) {
+    console.error('Error loading IconPark names:', error);
+    return new Set();
+  }
+};
+
+// Function to get Font Awesome icon names
+const getFontAwesomeNames = (): Set<string> => {
+  if (fontAwesomeNamesSet) {
+    return fontAwesomeNamesSet;
+  }
+  
+  fontAwesomeNamesSet = new Set();
+  Object.keys(FontAwesome).forEach(key => {
+    if (key.startsWith('fa') && key.length > 2) {
+      // Convert from faCamelCase to kebab-case
+      const iconName = key.substring(2).replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
+      fontAwesomeNamesSet!.add(iconName);
+    }
+  });
+  
+  return fontAwesomeNamesSet;
+};
+
+// Function to get Ant Design icon names
+const getAntDesignNames = (): Set<string> => {
+  if (antDesignNamesSet) {
+    return antDesignNamesSet;
+  }
+  
+  antDesignNamesSet = new Set();
+  Object.keys(AntDesign).forEach(key => {
+    if (key.endsWith('Outlined')) {
+      // Convert from PascalCaseOutlined to kebab-case
+      const iconName = key.replace('Outlined', '').replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
+      antDesignNamesSet!.add(iconName);
+    }
+  });
+  
+  return antDesignNamesSet;
+};
+
+// Function to get Heroicons names
+const getHeroiconsNames = (): Set<string> => {
+  if (heroiconsNamesSet) {
+    return heroiconsNamesSet;
+  }
+  
+  heroiconsNamesSet = new Set();
+  const addIconsFromLib = (lib: typeof Heroicons) => {
+    Object.keys(lib).forEach(key => {
+      if (key.endsWith('Icon')) {
+        // Convert from PascalCaseIcon to kebab-case
+        const iconName = key.replace('Icon', '').replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
+        heroiconsNamesSet!.add(iconName);
+      }
+    });
+  };
+  
+  addIconsFromLib(Heroicons as unknown as typeof Heroicons);
+  addIconsFromLib(HeroiconsSolid as unknown as typeof Heroicons);
+  
+  return heroiconsNamesSet;
+};
+
+// Function to get Lucide icon names
+const getLucideNames = (): Set<string> => {
+  if (lucideNamesSet) {
+    return lucideNamesSet;
+  }
+  
+  lucideNamesSet = new Set();
+  Object.keys(Lucide).forEach(key => {
+    // Convert from PascalCase to kebab-case
+    const iconName = key.replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
+    lucideNamesSet!.add(iconName);
+  });
+  
+  return lucideNamesSet;
+};
+
+// Unified validation function for all icon libraries
+const validateIconName = async (library: IconLibrary, iconName: string): Promise<boolean> => {
+  switch (library) {
+    case 'iconpark':
+      const iconParkNames = await loadIconParkNames();
+      return iconParkNames.has(iconName);
+    case 'font_awesome':
+      const fontAwesomeNames = getFontAwesomeNames();
+      return fontAwesomeNames.has(iconName);
+    case 'ant_design':
+      const antDesignNames = getAntDesignNames();
+      return antDesignNames.has(iconName);
+    case 'heroicons':
+      const heroiconsNames = getHeroiconsNames();
+      return heroiconsNames.has(iconName);
+    case 'lucide':
+      const lucideNames = getLucideNames();
+      return lucideNames.has(iconName);
+    default:
+      return false;
+  }
+};
+
+// Helper function to convert kebab-case to PascalCase
+const toPascalCase = (str: string) => {
+  return str
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('');
+};
+
+// Helper function to convert kebab-case to camelCase with 'fa' prefix
+const toFontAwesomeCamelCase = (str: string) => {
+  return 'fa' + str.split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('');
+};
+
+// Function to generate React code for each icon library
+const generateReactCode = (library: IconLibrary, iconName: string): string => {
+  switch (library) {
+    case 'iconpark':
+      const iconParkComponent = toPascalCase(iconName);
+      return `<${iconParkComponent} size={24} theme="outline" strokeWidth={2} />`;
+
+    case 'font_awesome':
+      const faIconKey = toFontAwesomeCamelCase(iconName);
+      return `<FontAwesomeIcon icon={${faIconKey}} />`;
+
+    case 'ant_design':
+      const antComponent = toPascalCase(iconName) + 'Outlined';
+      return `<${antComponent} />`;
+
+    case 'heroicons':
+      const heroComponent = toPascalCase(iconName) + 'Icon';
+      return `<${heroComponent} className="h-6 w-6" />`;
+
+    case 'lucide':
+      const lucideComponent = toPascalCase(iconName);
+      return `<${lucideComponent} size={24} />`;
+
+    default:
+      return `// Unknown library: ${library}`;
+  }
+};
+
 // Component to dynamically render Iconpark icons
 const IconParkIcon = ({ iconName, size = 32 }: { iconName: string; size?: number }) => {
-  // Convert kebab-case to PascalCase for IconPark component names
-  const toPascalCase = (str: string) => {
-    return str
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join('');
-  };
-
   const componentName = toPascalCase(iconName);
   
   // Get the icon component safely
@@ -53,15 +222,11 @@ const IconParkIcon = ({ iconName, size = 32 }: { iconName: string; size?: number
   try {
     IconComponent = (IconPark as unknown as Record<string, React.ComponentType<IconProps>>)[componentName];
   } catch (error) {
-    console.warn(`Icon ${iconName} (${componentName}) not found in IconPark library:`, error);
+    console.warn(`Icon ${iconName} (${componentName}) component not found in IconPark library:`, error);
   }
 
   if (!IconComponent) {
-    return (
-      <div className="flex items-center justify-center w-8 h-8 bg-muted rounded border-2 border-dashed border-muted-foreground/30">
-        <AlertCircle className="w-4 h-4 text-muted-foreground" />
-      </div>
-    );
+    return <ErrorIcon />;
   }
 
   return (
@@ -74,28 +239,112 @@ const IconParkIcon = ({ iconName, size = 32 }: { iconName: string; size?: number
   );
 };
 
+// Component to dynamically render Font Awesome icons
+const FontAwesomeIconComponent = ({ iconName, size = 32 }: { iconName: string; size?: number }) => {
+  const iconKey = toFontAwesomeCamelCase(iconName);
+  const icon = (FontAwesome as Record<string, unknown>)[iconKey];
+
+  if (!icon || typeof icon !== 'object') {
+    console.warn(`Icon ${iconName} (${iconKey}) not found in Font Awesome library`);
+    return <ErrorIcon />;
+  }
+
+  return (
+    <FontAwesomeIcon 
+      icon={icon as IconProp} 
+      size="lg" 
+      className="text-primary"
+      style={{ fontSize: `${size}px` }}
+    />
+  );
+};
+
+// Component to dynamically render Ant Design icons
+const AntDesignIcon = ({ iconName, size = 32 }: { iconName: string; size?: number }) => {
+  const componentName = toPascalCase(iconName) + 'Outlined';
+  const IconComponent = (AntDesign as unknown as Record<string, React.ComponentType<Record<string, unknown>>>)[componentName];
+
+  if (!IconComponent) {
+    console.warn(`Icon ${iconName} (${componentName}) not found in Ant Design library`);
+    return <ErrorIcon />;
+  }
+
+  return (
+    <IconComponent 
+      style={{ fontSize: `${size}px`, color: 'hsl(var(--primary))' }}
+    />
+  );
+};
+
+// Component to dynamically render Heroicons
+const HeroIcon = ({ iconName, size = 32 }: { iconName: string; size?: number }) => {
+  const componentName = toPascalCase(iconName) + 'Icon';
+  let IconComponent = (Heroicons as unknown as Record<string, React.ComponentType<Record<string, unknown>>>)[componentName];
+  
+  // Try solid version if outline doesn't exist
+  if (!IconComponent) {
+    IconComponent = (HeroiconsSolid as unknown as Record<string, React.ComponentType<Record<string, unknown>>>)[componentName];
+  }
+
+  if (!IconComponent) {
+    console.warn(`Icon ${iconName} (${componentName}) not found in Heroicons library`);
+    return <ErrorIcon />;
+  }
+
+  return (
+    <IconComponent 
+      width={size} 
+      height={size} 
+      className="text-primary"
+    />
+  );
+};
+
+// Component to dynamically render Lucide icons
+const LucideIcon = ({ iconName, size = 32 }: { iconName: string; size?: number }) => {
+  const componentName = toPascalCase(iconName);
+  const IconComponent = (Lucide as unknown as Record<string, React.ComponentType<Record<string, unknown>>>)[componentName];
+
+  if (!IconComponent) {
+    console.warn(`Icon ${iconName} (${componentName}) not found in Lucide library`);
+    return <ErrorIcon />;
+  }
+
+  return (
+    <IconComponent 
+      size={size} 
+      className="text-primary"
+    />
+  );
+};
+
+// Main icon renderer component
+const IconRenderer = ({ library, iconName, size = 32 }: { library: IconLibrary; iconName: string; size?: number }) => {
+  switch (library) {
+    case 'iconpark':
+      return <IconParkIcon iconName={iconName} size={size} />;
+    case 'font_awesome':
+      return <FontAwesomeIconComponent iconName={iconName} size={size} />;
+    case 'ant_design':
+      return <AntDesignIcon iconName={iconName} size={size} />;
+    case 'heroicons':
+      return <HeroIcon iconName={iconName} size={size} />;
+    case 'lucide':
+      return <LucideIcon iconName={iconName} size={size} />;
+    default:
+      return <ErrorIcon />;
+  }
+};
+
 export default function Home() {
   const [requirement, setRequirement] = useState("");
-  const [recommendations, setRecommendations] = useState<IconRecommendation[]>([]);
+  const [filteredRecommendations, setFilteredRecommendations] = useState<LLMResponse>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableIcons, setAvailableIcons] = useState<Set<string>>(new Set());
+  const [hasQueried, setHasQueried] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
-  // Function to load available icons from IconPark
-  const loadAvailableIcons = async (): Promise<Set<string>> => {
-    try {
-      const response = await fetch('/icons/iconpark.json');
-      if (!response.ok) {
-        console.warn('Could not load iconpark.json, all icons will be shown');
-        return new Set();
-      }
-      const icons: IconParkIconData[] = await response.json();
-      return new Set(icons.map(icon => icon.name));
-    } catch (err) {
-      console.error('Error loading available icons:', err);
-      return new Set();
-    }
-  };
 
   // Function to load system prompt from file
   const loadSystemPrompt = async (): Promise<string> => {
@@ -109,18 +358,63 @@ export default function Home() {
     } catch (err) {
       console.error('Error loading system prompt:', err);
       // Fallback to a basic prompt if file can't be loaded
-      return "You are an expert UI/UX design assistant specializing in iconography for the Iconpark icon library. Provide icon recommendations in JSON format with 'icons' array containing 'name' and 'reason' fields.";
+      return "You are an expert UI/UX design assistant specializing in iconography for the icon libraries (Iconpark, Font Awesome, Ant Design Icons, Heroicons & Lucide). Provide icon recommendations in JSON format with '{{icon_library_name}}' array containing 'name' and 'reason' fields.";
     }
   };
 
-  // Load available icons on component mount
-  useEffect(() => {
-    const loadIcons = async () => {
-      const icons = await loadAvailableIcons();
-      setAvailableIcons(icons);
-    };
-    loadIcons();
-  }, []);
+  // Function to filter invalid icons from recommendations
+  const filterValidIcons = async (recommendations: LLMResponse): Promise<LLMResponse> => {
+    const filtered: LLMResponse = {};
+    
+    for (const library of Object.keys(recommendations) as IconLibrary[]) {
+      const icons = recommendations[library] || [];
+      const validIcons: IconRecommendation[] = [];
+      
+      for (const icon of icons) {
+        const isValid = await validateIconName(library, icon.name);
+        if (isValid) {
+          validIcons.push(icon);
+        } else {
+          console.warn(`Filtered out invalid ${library} icon: "${icon.name}"`);
+        }
+      }
+      
+      if (validIcons.length > 0) {
+        filtered[library] = validIcons;
+      }
+    }
+    
+    return filtered;
+  };
+
+  // Function to copy text to clipboard with feedback
+  const copyToClipboard = async (text: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedStates(prev => ({ ...prev, [key]: true }));
+      
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedStates(prev => ({ ...prev, [key]: false }));
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Function to copy icon name
+  const copyIconName = (iconName: string, library: IconLibrary, index: number) => {
+    const key = `name-${library}-${iconName}-${index}`;
+    copyToClipboard(iconName, key);
+  };
+
+  // Function to copy React code
+  const copyReactCode = (iconName: string, library: IconLibrary, index: number) => {
+    const key = `code-${library}-${iconName}-${index}`;
+    const reactCode = generateReactCode(library, iconName);
+    copyToClipboard(reactCode, key);
+  };
+
 
   const handleSubmit = async () => {
     if (!requirement.trim()) {
@@ -130,19 +424,17 @@ export default function Home() {
 
     setIsLoading(true);
     setError(null);
-    setRecommendations([]);
+    setFilteredRecommendations({});
+    setHasQueried(true);
 
     try {
       // Load the system prompt from the markdown file
       const systemPrompt = await loadSystemPrompt();
-      
-      // Get configuration (works in both dev and production)
-      const config = getConfig();
 
-      const response = await fetch(config.GLM_API_URL, {
+      const response = await fetch("https://open.bigmodel.cn/api/paas/v4/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${config.GLM_API_TOKEN}`,
+          "Authorization": "Bearer c37e2abc95be4ff28bda363d9167d4e8.8feTrf06oc7D5C9R",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -175,13 +467,17 @@ export default function Home() {
       const data = await response.json();
       const content = data.choices[0]?.message?.content;
       
-      console.log(content);
       if (!content) {
         throw new Error("No content received from the API");
       }
 
       const parsedResponse: LLMResponse = JSON.parse(content);
-      setRecommendations(parsedResponse.icons || []);
+      
+      // Filter out invalid icons
+      setIsFiltering(true);
+      const validRecommendations = await filterValidIcons(parsedResponse);
+      setFilteredRecommendations(validRecommendations);
+      setIsFiltering(false);
     } catch (err) {
       console.error("Error calling LLM API:", err);
       setError(err instanceof Error ? err.message : "An error occurred while fetching recommendations");
@@ -260,72 +556,145 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* Results */}
-        {recommendations.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold">Recommended Icons</h2>
-              {(() => {
-                const filteredRecommendations = recommendations.filter(icon => 
-                  availableIcons.size === 0 || availableIcons.has(icon.name)
-                );
-                const filteredCount = recommendations.length - filteredRecommendations.length;
-                return filteredCount > 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    {filteredCount} icon{filteredCount > 1 ? 's' : ''} filtered out (not available in library)
-                  </p>
-                );
-              })()}
-            </div>
-            <div className="grid gap-4 md:gap-6">
-              {recommendations
-                .filter(icon => {
-                  // Only show icons that exist in the IconPark library
-                  // If availableIcons is empty (failed to load), show all icons
-                  return availableIcons.size === 0 || availableIcons.has(icon.name);
-                })
-                .map((icon, index) => (
-                  <Card key={index} className="transition-colors hover:bg-accent/50">
-                    <CardContent className="pt-6">
-                      <div className="grid md:grid-cols-[auto_200px_1fr] gap-4 items-start">
-                        <div className="flex items-center justify-center w-16 h-16 bg-background border rounded-lg shadow-sm">
-                          <IconParkIcon iconName={icon.name} size={32} />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg text-primary">
-                            {icon.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Iconpark Library
-                          </p>
-                          <div className="mt-2 text-xs text-muted-foreground bg-muted px-2 py-1 rounded font-mono">
-                            {icon.name}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm leading-relaxed">
-                            {icon.reason}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* Empty state when no results */}
-        {!isLoading && recommendations.length === 0 && requirement && !error && (
+        {/* Filtering state */}
+        {isFiltering && (
           <Card>
             <CardContent className="pt-6 text-center">
-              <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
               <p className="text-muted-foreground">
-                No recommendations found. Try describing your requirements differently.
+                Validating icon recommendations...
               </p>
             </CardContent>
           </Card>
         )}
+
+        {/* Results - Only show after query has been executed and results are available */}
+        {!isLoading && !isFiltering && hasQueried && !error && (() => {
+          // Get library display names
+          const getLibraryDisplayName = (library: IconLibrary) => {
+            const names = {
+              iconpark: 'IconPark',
+              font_awesome: 'Font Awesome',
+              ant_design: 'Ant Design',
+              heroicons: 'Heroicons',
+              lucide: 'Lucide'
+            };
+            return names[library];
+          };
+          
+          // Get library tag colors
+          const getLibraryTagColor = (library: IconLibrary) => {
+            const colors = {
+              iconpark: 'bg-blue-100 text-blue-800 border-blue-200',
+              font_awesome: 'bg-orange-100 text-orange-800 border-orange-200',
+              ant_design: 'bg-purple-100 text-purple-800 border-purple-200',
+              heroicons: 'bg-green-100 text-green-800 border-green-200',
+              lucide: 'bg-indigo-100 text-indigo-800 border-indigo-200'
+            };
+            return colors[library];
+          };
+          
+          // Calculate total recommendations across all libraries (using filtered recommendations)
+          const allRecommendations: Array<{ library: IconLibrary; icon: IconRecommendation }> = [];
+          (Object.keys(filteredRecommendations) as IconLibrary[]).forEach(library => {
+            const icons = filteredRecommendations[library] || [];
+            icons.forEach(icon => {
+              allRecommendations.push({ library, icon });
+            });
+          });
+          
+          // Show results if we have recommendations
+          if (allRecommendations.length > 0) {
+            return (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold">Recommended Icons</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {allRecommendations.length} valid icon{allRecommendations.length > 1 ? 's' : ''} found across {Object.keys(filteredRecommendations).length} librar{Object.keys(filteredRecommendations).length > 1 ? 'ies' : 'y'}
+                  </p>
+                </div>
+                <div className="grid gap-4 md:gap-6">
+                  {allRecommendations.map((item, index) => (
+                    <Card key={`${item.library}-${item.icon.name}-${index}`} className="transition-colors hover:bg-accent/50">
+                      <CardContent className="pt-6">
+                        <div className="grid md:grid-cols-[auto_200px_1fr_auto] gap-4 items-start">
+                          <div className="flex items-center justify-center w-16 h-16 bg-background border rounded-lg shadow-sm">
+                            <IconRenderer library={item.library} iconName={item.icon.name} size={32} />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg text-primary">
+                              {item.icon.name}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-1 rounded-md border font-medium ${getLibraryTagColor(item.library)}`}>
+                                {getLibraryDisplayName(item.library)}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm leading-relaxed">
+                              {item.icon.reason}
+                            </p>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyIconName(item.icon.name, item.library, index)}
+                              className="h-8 px-3 text-xs cursor-pointer"
+                            >
+                              {copiedStates[`name-${item.library}-${item.icon.name}-${index}`] ? (
+                                <>
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3 w-3 mr-1" />
+                                  Name
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyReactCode(item.icon.name, item.library, index)}
+                              className="h-8 px-3 text-xs cursor-pointer"
+                            >
+                              {copiedStates[`code-${item.library}-${item.icon.name}-${index}`] ? (
+                                <>
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-3 w-3 mr-1" />
+                                  Code
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          
+          // Show empty state if no recommendations
+          return (
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  No recommendations found. Try describing your requirements differently.
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })()}
         </div>
     </div>
   );
