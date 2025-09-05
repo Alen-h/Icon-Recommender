@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles, Search, AlertCircle } from "lucide-react";
 import * as IconPark from "@icon-park/react";
-import { config } from "../config.local.js";
+import { getConfig } from "@/lib/config";
 
 interface IconRecommendation {
   name: string;
@@ -135,6 +135,9 @@ export default function Home() {
     try {
       // Load the system prompt from the markdown file
       const systemPrompt = await loadSystemPrompt();
+      
+      // Get configuration (works in both dev and production)
+      const config = getConfig();
 
       const response = await fetch(config.GLM_API_URL, {
         method: "POST",

@@ -11,22 +11,26 @@ An AI-powered icon recommendation system that helps UI/UX designers, product man
 ## ✨ Features
 
 ### 🤖 **AI-Powered Recommendations**
+
 - **Smart Analysis**: Powered by GLM LLM for intelligent icon suggestions
 - **Context-Aware**: Considers your specific use case and application context
 - **Detailed Explanations**: Each recommendation comes with clear reasoning
 
 ### 🎯 **Real Icon Preview**
+
 - **Visual Display**: See actual IconPark icons alongside recommendations
 - **Library Validation**: Only shows icons that actually exist in the library
 - **Interactive UI**: Clean, modern interface built with Shadcn UI
 
 ### 🛠 **Professional Features**
+
 - **Configurable System Prompts**: Edit AI behavior via markdown files
 - **Secure Token Management**: API credentials stored safely outside version control
 - **Error Handling**: Robust error handling and fallback mechanisms
 - **Responsive Design**: Works perfectly on desktop and mobile devices
 
 ### 🔧 **Developer Experience**
+
 - **TypeScript**: Full type safety throughout the application
 - **Modern Stack**: Built with Next.js 15, React 19, and Tailwind CSS
 - **Clean Architecture**: Well-organized code structure and separation of concerns
@@ -42,12 +46,14 @@ An AI-powered icon recommendation system that helps UI/UX designers, product man
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Alen-h/Icon-Recommender.git
    cd Icon-Recommender
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -57,13 +63,15 @@ An AI-powered icon recommendation system that helps UI/UX designers, product man
    ```
 
 3. **Configure API credentials**
+
    ```bash
    cp config.local.example.js config.local.js
    ```
-   
+
    Edit `config.local.js` and replace `'your-glm-api-token-here'` with your actual GLM API token.
 
 4. **Start the development server**
+
    ```bash
    npm run dev
    # or
@@ -73,7 +81,7 @@ An AI-powered icon recommendation system that helps UI/UX designers, product man
    ```
 
 5. **Open your browser**
-   
+
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 📖 Usage
@@ -81,6 +89,7 @@ An AI-powered icon recommendation system that helps UI/UX designers, product man
 ### Basic Usage
 
 1. **Describe Your Needs**: Enter a description of the icon you need in the textarea
+
    ```
    Example: "I need an icon for a delete button in my mobile app"
    ```
@@ -139,15 +148,27 @@ Icon-Recommender/
 
 ### API Configuration
 
-The application uses a secure configuration system:
+The application supports both development and production configuration:
 
+**For Development (Local):**
 ```javascript
-// config.local.js (create from template)
+// config.local.js (create from config.local.example.js)
 export const config = {
-  GLM_API_TOKEN: 'your-actual-token-here',
-  GLM_API_URL: 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+  GLM_API_TOKEN: "your-actual-token-here",
+  GLM_API_URL: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
 };
 ```
+
+**For Production (Vercel/Environment Variables):**
+```bash
+# Set these in your deployment platform
+GLM_API_TOKEN=your-actual-token-here
+GLM_API_URL=https://open.bigmodel.cn/api/paas/v4/chat/completions
+```
+
+The application automatically detects which configuration method to use:
+- **Production**: Uses environment variables (`process.env.GLM_API_TOKEN`)
+- **Development**: Falls back to `config.local.js` if environment variables aren't set
 
 ### System Prompt Customization
 
@@ -164,14 +185,25 @@ Edit `public/system-prompt.md` to customize how the AI analyzes requests and pro
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Alen-h/Icon-Recommender)
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add your `GLM_API_TOKEN` as an environment variable
-4. Deploy!
+1. **Push your code to GitHub** (make sure `config.local.js` is not committed)
+
+2. **Connect your repository to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+
+3. **Add Environment Variables**
+   In your Vercel project settings, add:
+   ```
+   GLM_API_TOKEN=your-actual-glm-api-token-here
+   GLM_API_URL=https://open.bigmodel.cn/api/paas/v4/chat/completions
+   ```
+
+4. **Deploy!** - Vercel will automatically build and deploy your application
 
 ### Manual Deployment
 
 1. **Build the application**
+
    ```bash
    npm run build
    ```
@@ -227,21 +259,32 @@ The application integrates with the GLM (General Language Model) API for intelli
 ### Common Issues
 
 **Icons not displaying?**
+
 - Check that `public/icons/iconpark.json` exists
 - Verify the icon names in recommendations match the library
 
 **API calls failing?**
+
 - Verify your GLM API token in `config.local.js`
 - Check network connectivity
 - Ensure the API endpoint is accessible
 
 **TypeScript errors?**
+
 - Run `npm run build` to check for type issues
 - Ensure all dependencies are properly installed
 
 **Styling issues?**
+
 - Clear your browser cache
 - Check that Tailwind CSS classes are being applied
+
+**Deployment failing on Vercel?**
+
+- Ensure `GLM_API_TOKEN` environment variable is set in Vercel dashboard
+- Check that `config.local.js` is in `.gitignore` (it should not be deployed)
+- Verify the environment variable names match exactly: `GLM_API_TOKEN`
+- Check Vercel build logs for specific error messages
 
 ## 📄 License
 
