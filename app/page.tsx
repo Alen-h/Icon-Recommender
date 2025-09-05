@@ -346,21 +346,6 @@ export default function Home() {
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
 
-  // Function to load system prompt from file
-  const loadSystemPrompt = async (): Promise<string> => {
-    try {
-      const response = await fetch('/system-prompt.md');
-      if (!response.ok) {
-        throw new Error('Failed to load system prompt');
-      }
-      const content = await response.text();
-      return content;
-    } catch (err) {
-      console.error('Error loading system prompt:', err);
-      // Fallback to a basic prompt if file can't be loaded
-      return "You are an expert UI/UX design assistant specializing in iconography for the icon libraries (Iconpark, Font Awesome, Ant Design Icons, Heroicons & Lucide). Provide icon recommendations in JSON format with '{{icon_library_name}}' array containing 'name' and 'reason' fields.";
-    }
-  };
 
   // Function to filter invalid icons from recommendations
   const filterValidIcons = async (recommendations: LLMResponse): Promise<LLMResponse> => {
@@ -428,50 +413,22 @@ export default function Home() {
     setHasQueried(true);
 
     try {
-      // Load the system prompt from the markdown file
-      const systemPrompt = await loadSystemPrompt();
-
-      const response = await fetch("https://open.bigmodel.cn/api/paas/v4/chat/completions", {
+      const response = await fetch("/api/recommend", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer c37e2abc95be4ff28bda363d9167d4e8.8feTrf06oc7D5C9R",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "glm-4.5-flash",
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            {
-              role: "user",
-              content: requirement
-            }
-          ],
-          thinking: {
-            type: "disabled"
-          },
-          temperature: 0.8,
-          max_tokens: 4096,
-          response_format: {
-            type: "json_object"
-          }
+          requirement: requirement
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      const content = data.choices[0]?.message?.content;
-      
-      if (!content) {
-        throw new Error("No content received from the API");
-      }
-
-      const parsedResponse: LLMResponse = JSON.parse(content);
+      const parsedResponse: LLMResponse = await response.json();
       
       // Filter out invalid icons
       setIsFiltering(true);

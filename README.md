@@ -1,6 +1,6 @@
 # Icon Recommender 🎨
 
-An AI-powered icon recommendation tool that helps developers and designers find the perfect icons for their projects. Describe what you need, and get curated suggestions from multiple popular icon libraries.
+An AI-powered icon recommendation tool that helps developers and designers find the perfect icons for their projects. Simply describe what you need in natural language, and get intelligent, curated suggestions from multiple popular icon libraries with real-time validation.
 
 ![Icon Recommender](https://img.shields.io/badge/Next.js-15.5.2-black?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19.1.0-blue?logo=react&logoColor=white)
@@ -9,37 +9,54 @@ An AI-powered icon recommendation tool that helps developers and designers find 
 
 ## ✨ Features
 
-- **AI-Powered Recommendations**: Uses advanced language models to understand your requirements and suggest relevant icons
-- **Multiple Icon Libraries**: Supports 5 popular icon libraries:
-  - [IconPark](https://iconpark.oceanengine.com/) - Modern and versatile icons
-  - [Font Awesome](https://fontawesome.com/) - The web's most popular icon set
-  - [Ant Design Icons](https://ant.design/components/icon/) - Beautiful icons from Ant Design
+- **🤖 AI-Powered Recommendations**: Uses GLM-4.5-Flash model to understand your requirements and suggest contextually relevant icons
+- **📚 5 Popular Icon Libraries**: Comprehensive support for:
+  - [IconPark](https://iconpark.oceanengine.com/) - Modern and versatile icons with theme support
+  - [Font Awesome](https://fontawesome.com/) - The web's most popular icon set (7.0.1)
+  - [Ant Design Icons](https://ant.design/components/icon/) - Beautiful icons from Ant Design system
   - [Heroicons](https://heroicons.com/) - Clean SVG icons by Tailwind CSS creators
   - [Lucide](https://lucide.dev/) - Beautiful & consistent icon toolkit
-- **Real-time Icon Validation**: Automatically filters out invalid icon names
-- **Copy to Clipboard**: Easy copying of icon names and React code snippets
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Modern UI**: Built with shadcn/ui components and Tailwind CSS
+- **🔍 Real-time Icon Validation**: Automatically filters out invalid icon names and shows only available icons
+- **📋 Smart Copy Functions**: One-click copying of icon names and ready-to-use React code snippets
+- **📱 Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **🎨 Modern UI**: Built with shadcn/ui components and Tailwind CSS 4
+- **⚡ Fast Performance**: Next.js 15 with App Router and Turbopack for lightning-fast development
+- **🔧 Extensible**: Easy to add new icon libraries and customize recommendations
 
 ## 🚀 Demo
 
 **Live Demo:** [icon-recommender.vercel.app](https://icon-recommender.vercel.app)
 
-Simply describe what kind of icon you need:
+### How it works:
+1. **Describe your needs** in natural language
+2. **AI analyzes** your requirements using advanced language understanding
+3. **Get curated suggestions** from 5 icon libraries with explanations
+4. **Copy and use** icon names or React code snippets instantly
+
+### Example queries:
 - "I need an icon for a delete button in my mobile app"
 - "Looking for icons for a user profile section"
 - "Need icons for a shopping cart feature"
+- "Icons for file upload functionality"
+- "Social media sharing buttons"
 
-The AI will analyze your request and provide relevant icon suggestions with explanations for why each icon fits your needs.
+The AI provides context-aware recommendations with detailed explanations for why each icon fits your specific needs.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router & Turbopack
+- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
+- **Runtime**: [React 19.1.0](https://react.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **Icons**: Multiple libraries (IconPark, Font Awesome, Ant Design, Heroicons, Lucide)
-- **AI**: GLM-4.5-Flash model for intelligent recommendations
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/) with Radix UI primitives
+- **Icon Libraries**: 
+  - [IconPark](https://iconpark.oceanengine.com/) (v1.4.2)
+  - [Font Awesome](https://fontawesome.com/) (v7.0.1)
+  - [Ant Design Icons](https://ant.design/components/icon/) (v5.6.1)
+  - [Heroicons](https://heroicons.com/) (v2.2.0)
+  - [Lucide React](https://lucide.dev/) (v0.542.0)
+- **AI Model**: GLM-4.5-Flash for intelligent icon recommendations
+- **Development**: ESLint 9 for code quality
 
 ## 📦 Installation
 
@@ -58,11 +75,16 @@ The AI will analyze your request and provide relevant icon suggestions with expl
    pnpm install
    ```
 
-3. **Set up configuration:**
+3. **Set up environment variables:**
    ```bash
    cp config.local.example.js config.local.js
    ```
-   Edit `config.local.js` with your API credentials if needed.
+   Edit `config.local.js` with your GLM API credentials:
+   ```javascript
+   module.exports = {
+     GLM_API_TOKEN: "your-glm-api-token-here"
+   };
+   ```
 
 4. **Run the development server:**
    ```bash
@@ -78,43 +100,98 @@ The AI will analyze your request and provide relevant icon suggestions with expl
 
 ## 🔧 Configuration
 
-The application uses a system prompt loaded from `public/system-prompt.md` to guide the AI's icon recommendations. You can customize this prompt to adjust the recommendation behavior.
+### Environment Setup
+The application requires a GLM API token for AI-powered recommendations. Set up your `config.local.js` file:
+
+```javascript
+module.exports = {
+  GLM_API_TOKEN: "your-glm-api-token-here"
+};
+```
+
+### Customizing AI Behavior
+The application uses a system prompt from `public/system-prompt.md` to guide the AI's icon recommendations. You can customize this prompt to:
+- Adjust recommendation criteria
+- Change the response format
+- Add specific guidelines for your use case
+- Modify the number of recommendations per library
 
 ## 🎯 Usage
 
-1. **Enter your requirement**: Describe what kind of icon you need in the text area
-2. **Get recommendations**: Click "Get Recommendations" or press `Cmd+Enter`
-3. **Browse results**: View AI-curated icon suggestions with explanations
-4. **Copy what you need**: Use the copy buttons to get icon names or React code snippets
+### Basic Workflow
+1. **Describe your needs**: Enter a detailed description of what kind of icon you need
+2. **Get AI recommendations**: Click "Get Recommendations" or press `Cmd+Enter`
+3. **Review suggestions**: Browse AI-curated icons from multiple libraries with explanations
+4. **Copy and implement**: Use copy buttons to get icon names or ready-to-use React code
+
+### Best Practices for Descriptions
+- Be specific about the context (e.g., "mobile app delete button" vs "delete")
+- Mention the use case (e.g., "user profile", "shopping cart", "file upload")
+- Include style preferences if any (e.g., "minimalist", "outlined", "filled")
+- Specify the action or function (e.g., "save", "edit", "share", "download")
+
+### Icon Output Formats
+- **Icon Name**: Copy the exact icon name for manual implementation
+- **React Code**: Copy ready-to-use JSX with proper imports and props
 
 ## 📁 Project Structure
 
 ```
 Icon-Recommender/
-├── app/                    # Next.js app directory
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Main page component
-├── components/            # Reusable components
+├── app/                    # Next.js 15 App Router
+│   ├── api/
+│   │   └── recommend/
+│   │       └── route.ts   # API endpoint for AI recommendations
+│   ├── globals.css        # Global Tailwind styles
+│   ├── layout.tsx         # Root layout component
+│   ├── page.tsx           # Main application page
+│   └── favicon.ico        # App favicon
+├── components/            # Reusable React components
 │   └── ui/               # shadcn/ui components
-├── lib/                  # Utilities and configuration
+│       ├── button.tsx    # Button component
+│       ├── card.tsx      # Card component
+│       └── textarea.tsx  # Textarea component
+├── lib/                  # Utility libraries
+│   ├── config.ts         # Configuration utilities
+│   └── utils.ts          # Helper functions
 ├── public/               # Static assets
-│   ├── icons/           # Icon library data
-│   └── system-prompt.md # AI system prompt
-├── config.local.js       # Local API configuration
-├── config.local.example.js # Configuration template
-└── ...config files
+│   ├── icons/
+│   │   └── iconpark.json # IconPark icon data
+│   └── system-prompt.md  # AI system prompt template
+├── config.local.js       # Local environment configuration
+├── config.local.example.js # Configuration example
+├── components.json       # shadcn/ui configuration
+├── package.json          # Dependencies and scripts
+├── tsconfig.json         # TypeScript configuration
+├── tailwind.config.js    # Tailwind CSS configuration
+└── next.config.ts        # Next.js configuration
 ```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Whether it's adding new icon libraries, improving AI recommendations, or enhancing the UI, we'd love your help.
 
+### Development Setup
 1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Clone your fork: `git clone https://github.com/your-username/Icon-Recommender.git`
+3. Install dependencies: `npm install`
+4. Set up your `config.local.js` with API credentials
+5. Start development server: `npm run dev`
+
+### Contribution Guidelines
+1. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Make your changes with proper TypeScript typing
+3. Test your changes thoroughly
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request with a clear description
+
+### Areas for Contribution
+- **New Icon Libraries**: Add support for additional icon sets
+- **AI Improvements**: Enhance the recommendation algorithm
+- **UI/UX**: Improve the user interface and experience
+- **Performance**: Optimize icon loading and validation
+- **Documentation**: Improve README, code comments, and guides
 
 ## 📄 License
 
@@ -122,18 +199,47 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [IconPark](https://iconpark.oceanengine.com/) for their beautiful icon collection
-- [Font Awesome](https://fontawesome.com/) for the most popular web icons
-- [Ant Design](https://ant.design/) for their design system and icons
-- [Heroicons](https://heroicons.com/) for clean and consistent SVG icons
-- [Lucide](https://lucide.dev/) for their beautiful icon toolkit
-- [shadcn/ui](https://ui.shadcn.com/) for the excellent UI components
-- [Vercel](https://vercel.com/) for the deployment platform
+- **Icon Libraries**:
+  - [IconPark](https://iconpark.oceanengine.com/) - Modern and versatile icons from ByteDance
+  - [Font Awesome](https://fontawesome.com/) - The web's most popular icon set
+  - [Ant Design](https://ant.design/) - Design system and icons from Ant Group
+  - [Heroicons](https://heroicons.com/) - Clean SVG icons by Tailwind CSS creators
+  - [Lucide](https://lucide.dev/) - Beautiful icon toolkit forked from Feather Icons
+- **Technology Stack**:
+  - [Next.js](https://nextjs.org/) - React framework for production
+  - [shadcn/ui](https://ui.shadcn.com/) - Beautifully designed UI components
+  - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+  - [GLM API](https://open.bigmodel.cn/) - AI model for intelligent recommendations
+  - [Vercel](https://vercel.com/) - Deployment and hosting platform
+
+## 🚀 Deployment
+
+The application is optimized for Vercel deployment:
+
+```bash
+npm run build    # Build for production
+npm start        # Start production server
+```
+
+Environment variables needed for production:
+- `GLM_API_TOKEN`: Your GLM API token for AI recommendations
 
 ## 🐛 Issues & Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/Alen-h/Icon-Recommender/issues) on GitHub.
+If you encounter any issues or have questions:
+- [Open an issue](https://github.com/Alen-h/Icon-Recommender/issues) on GitHub
+- Check existing issues for solutions
+- Provide detailed reproduction steps for bugs
+
+## 📊 Roadmap
+
+- [ ] Add more icon libraries (Feather, Phosphor, etc.)
+- [ ] Implement icon favorites and collections
+- [ ] Add dark mode support
+- [ ] Export icon collections as SVG/PNG
+- [ ] API for programmatic access
+- [ ] Icon search without AI for faster browsing
 
 ---
 
-Made with ❤️ by [Alen-h](https://github.com/Alen-h)
+Made with ❤️ by [Alen-h](https://github.com/Alen-h) | Powered by AI
