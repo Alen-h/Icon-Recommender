@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local configuration files with sensitive data
+config.local.js
+
 # vercel
 .vercel
 
