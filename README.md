@@ -23,6 +23,8 @@ An AI-powered icon recommendation tool that helps developers and designers find 
 
 ## 🚀 Demo
 
+**Live Demo:** [icon-recommender.vercel.app](https://icon-recommender.vercel.app)
+
 Simply describe what kind of icon you need:
 - "I need an icon for a delete button in my mobile app"
 - "Looking for icons for a user profile section"
@@ -43,8 +45,8 @@ The AI will analyze your request and provide relevant icon suggestions with expl
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/icon-recommender.git
-   cd icon-recommender
+   git clone https://github.com/Alen-h/Icon-Recommender.git
+   cd Icon-Recommender
    ```
 
 2. **Install dependencies:**
@@ -88,7 +90,7 @@ The application uses a system prompt loaded from `public/system-prompt.md` to gu
 ## 📁 Project Structure
 
 ```
-icon-recommender/
+Icon-Recommender/
 ├── app/                    # Next.js app directory
 │   ├── globals.css        # Global styles
 │   ├── layout.tsx         # Root layout
@@ -99,6 +101,8 @@ icon-recommender/
 ├── public/               # Static assets
 │   ├── icons/           # Icon library data
 │   └── system-prompt.md # AI system prompt
+├── config.local.js       # Local API configuration
+├── config.local.example.js # Configuration template
 └── ...config files
 ```
 
@@ -128,8 +132,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🐛 Issues & Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/icon-recommender/issues) on GitHub.
+If you encounter any issues or have questions, please [open an issue](https://github.com/Alen-h/Icon-Recommender/issues) on GitHub.
 
 ---
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+Made with ❤️ by [Alen-h](https://github.com/Alen-h)
